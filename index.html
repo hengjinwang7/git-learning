@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git 学习笔记 · git-learning</title>
+<style>
+  :root {
+    --midnight: #2D2E50;   /* 午夜蓝 */
+    --yellow:  #DCE94B;    /* 亮黄 */
+    --purple:  #C7BFE8;    /* 淡紫 */
+    --bg:      #F4F3FA;
+    --card:    #FFFFFF;
+    --ink:     #2D2E50;
+    --ink-soft: #6B6C8F;
+    --mono: "Cascadia Code", Consolas, "Courier New", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", cursive;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+  }
+
+  /* ===== 头部 ===== */
+  header {
+    background: linear-gradient(135deg, #232440 0%, var(--midnight) 60%, #3A3B66 100%);
+    color: #fff;
+    padding: 56px 24px 48px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    letter-spacing: 2px;
+  }
+  header h1 em {
+    font-style: normal;
+    color: var(--yellow);
+    text-decoration: underline wavy var(--yellow) 3px;
+    text-underline-offset: 8px;
+  }
+  header p {
+    margin-top: 14px;
+    color: var(--purple);
+    font-size: 17px;
+  }
+  .badge-row { margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    background: rgba(199,191,232,.16);
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 13px;
+  }
+
+  main { max-width: 980px; margin: -24px auto 0; padding: 0 20px 40px; }
+
+  /* ===== 卡片 ===== */
+  section.card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 24px rgba(45,46,80,.10);
+    border-top: 6px solid transparent;
+  }
+  section.card.yellow { border-top-color: var(--yellow); }
+  section.card.purple { border-top-color: var(--purple); }
+  section.card.midnight { border-top-color: var(--midnight); }
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .yellow h2 .dot { background: var(--yellow); }
+  .purple h2 .dot { background: var(--purple); }
+  .midnight h2 .dot { background: var(--midnight); }
+
+  /* 四区流转 */
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .flow .node {
+    flex: 1 1 150px;
+    text-align: center;
+    padding: 14px 10px;
+    border-radius: 14px;
+    font-size: 16px;
+  }
+  .flow .node small { display: block; font-size: 12px; color: var(--ink-soft); }
+  .flow .n1 { background: var(--purple); }
+  .flow .n2 { background: var(--yellow); }
+  .flow .n3 { background: var(--midnight); color: #fff; }
+  .flow .n3 small { color: var(--purple); }
+  .flow .n4 { background: var(--ink-soft); color: #fff; }
+  .flow .n4 small { color: var(--bg); }
+  .flow .arrow { font-size: 20px; color: var(--ink-soft); font-family: var(--mono); }
+
+  /* 口诀 */
+  .formula {
+    background: var(--midnight);
+    color: #fff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .formula b { color: var(--yellow); font-weight: normal; }
+  .formula code {
+    font-family: var(--mono);
+    background: rgba(220,233,75,.15);
+    color: var(--yellow);
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-size: 16px;
+  }
+
+  /* 命令表 */
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px dashed #E4E3F0; }
+  th { color: var(--ink-soft); font-size: 14px; }
+  td code {
+    font-family: var(--mono);
+    background: #EFEEF8;
+    color: var(--midnight);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 14.5px;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* 时间线 */
+  .timeline { list-style: none; padding-left: 22px; border-left: 3px solid var(--purple); }
+  .timeline li { position: relative; padding: 0 0 18px 18px; }
+  .timeline li:last-child { padding-bottom: 0; }
+  .timeline li::before {
+    content: "";
+    position: absolute;
+    left: -29px; top: 8px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--yellow);
+    border: 3px solid var(--bg);
+  }
+  .timeline time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-right: 8px;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 24px;
+  }
+  footer code { font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><em>Git</em> 学习笔记</h1>
+  <p>从零搭好一个仓库的完整一天 —— 2026-11-14</p>
+  <div class="badge-row">
+    <span class="badge">分支 main</span>
+    <span class="badge">GitHub · git-learning</span>
+    <span class="badge">私人学习仓库</span>
+  </div>
+</header>
+
+<main>
+
+  <section class="card yellow">
+    <h2><span class="dot"></span>代码的四个家</h2>
+    <div class="flow">
+      <div class="node n1">工作区<small>Working Directory</small></div>
+      <span class="arrow">→</span>
+      <div class="node n2">暂存区<small>Staging Area</small></div>
+      <span class="arrow">→</span>
+      <div class="node n3">本地仓库<small>Local Repository</small></div>
+      <span class="arrow">→</span>
+      <div class="node n4">远程仓库<small>GitHub</small></div>
+    </div>
+    <p style="margin-top:14px; color:var(--ink-soft); font-size:15px;">
+      每一次改动从左到右「搬家」，<code style="font-family:var(--mono);">git status</code> 会报告它现在住在哪。
+    </p>
+  </section>
+
+  <section class="card midnight">
+    <h2><span class="dot"></span>日常口诀：查 → 装 → 存 → 推</h2>
+    <div class="formula">
+      <span>查 <code>git status</code></span>
+      <b>→</b>
+      <span>装 <code>git add</code></span>
+      <b>→</b>
+      <span>存 <code>git commit</code></span>
+      <b>→</b>
+      <span>推 <code>git push</code></span>
+    </div>
+    <p style="margin-top:14px; color:var(--ink-soft); font-size:15px;">
+      团队协作时，推送前先拉取：<code style="font-family:var(--mono);">git pull</code>。背下这四步，覆盖 90% 的日常场景。
+    </p>
+  </section>
+
+  <section class="card purple">
+    <h2><span class="dot"></span>常用命令速查</h2>
+    <table>
+      <tr><th>命令</th><th>作用</th></tr>
+      <tr><td><code>git status --short --branch</code></td><td>看现状（简洁版，含远程同步状态）</td></tr>
+      <tr><td><code>git add 文件名</code></td><td>把改动装进暂存区</td></tr>
+      <tr><td><code>git commit -m "说明"</code></td><td>打包成一次永久存档</td></tr>
+      <tr><td><code>git log --oneline --decorate</code></td><td>查看提交历史（一行一提交）</td></tr>
+      <tr><td><code>git push</code></td><td>把本地提交上云（首次需 <code>-u origin main</code>）</td></tr>
+      <tr><td><code>git diff</code></td><td>逐行看改了什么</td></tr>
+      <tr><td><code>git remote -v</code></td><td>查看远程仓库关联</td></tr>
+      <tr><td><code>git check-ignore -v 路径</code></td><td>验证忽略规则是否命中</td></tr>
+    </table>
+  </section>
+
+  <section class="card midnight">
+    <h2><span class="dot"></span>今日搭建时间线</h2>
+    <ul class="timeline">
+      <li><time>13:16</time>环境核查：Git 2.55.0 · 工作区空目录 · 非仓库</li>
+      <li><time>13:20</time>写入全局身份：Hengjin Wang &lt;1031616967@qq.com&gt;</li>
+      <li><time>13:35</time>git init + 仓库级署名 Wang Hengjin + .gitignore + 分支改名 main</li>
+      <li><time>13:38</time>首次提交 de76a2b · 远程建仓 GitHub · 推送成功</li>
+      <li><time>13:46</time>README 首页 · 74e697b · 持续同步 origin/main</li>
+      <li><time>13:55</time>术语库 git-glossary.md（60+ 术语，含今日真实报错）</li>
+      <li><time>14:00</time>本页 index.html —— 静态首页练习</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  Wang Hengjin · git-learning · 2026-11-14<br>
+  术语库见仓库内 <code>git-glossary.md</code>
+</footer>
+
+</body>
+</html>
